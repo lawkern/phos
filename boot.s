@@ -1,7 +1,5 @@
 /* (c) copyright 2025 Lawrence D. Kern /////////////////////////////////////// */
 
-   .intel_syntax noprefix
-
 // NOTE: Set up the multiboot header.
    .set Multiboot_Align, 1<<0
    .set Multiboot_Meminfo, 1<<1
@@ -19,7 +17,7 @@
    .section .bss
    .align 16
 Stack_Bottom:
-   .skip 0x40000
+   .skip 16384
 Stack_Top:
 
 // NOTE: Set up the entry point.
@@ -27,7 +25,8 @@ Stack_Top:
    .global Boot_Main
    .type Boot_Main, @function
 Boot_Main:
-   mov esp, Stack_Top
+   mov $Stack_Top, %esp
+
    call Kernel_Main
    cli
 1: hlt
