@@ -5,29 +5,29 @@ static terminal_context Terminal;
 static
 void Enable_Text_Cursor(u8 First_Scanline, u8 Last_Scanline)
 {
-	Send_Byte(0x3D4, 0x0A);
-	Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xC0) | First_Scanline);
+   Send_Byte(0x3D4, 0x0A);
+   Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xC0) | First_Scanline);
 
-	Send_Byte(0x3D4, 0x0B);
-	Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xE0) | Last_Scanline);
+   Send_Byte(0x3D4, 0x0B);
+   Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xE0) | Last_Scanline);
 }
 
 static
 void Disable_Text_Cursor(void)
 {
-	Send_Byte(0x3D4, 0x0A);
-	Send_Byte(0x3D5, 0x20);
+   Send_Byte(0x3D4, 0x0A);
+   Send_Byte(0x3D5, 0x20);
 }
 
 static
 void Update_Text_Cursor(idx X, idx Y)
 {
-	u16 Position = VGA_WIDTH*Y + X;
+   u16 Position = VGA_WIDTH*Y + X;
 
-	Send_Byte(0x3D4, 0x0F);
-	Send_Byte(0x3D5, (u8)(Position & 0xFF));
-	Send_Byte(0x3D4, 0x0E);
-	Send_Byte(0x3D5, (u8)((Position >> 8) & 0xFF));
+   Send_Byte(0x3D4, 0x0F);
+   Send_Byte(0x3D5, (u8)(Position & 0xFF));
+   Send_Byte(0x3D4, 0x0E);
+   Send_Byte(0x3D5, (u8)((Position >> 8) & 0xFF));
 }
 
 static inline
