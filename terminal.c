@@ -2,6 +2,12 @@
 
 static terminal_context Terminal;
 
+static inline
+u8 Terminal_Color(void)
+{
+   return Pack_VGA_Color(Terminal.Foreground, Terminal.Background);
+}
+
 static
 void Initialize_Terminal(vga_color Foreground, vga_color Background)
 {
@@ -12,7 +18,7 @@ void Initialize_Terminal(vga_color Foreground, vga_color Background)
    Terminal.Foreground = Foreground;
    Terminal.Background = Background;
 
-   u8 Cell_Color = Pack_VGA_Color(Foreground, Background);
+   u8 Cell_Color = Terminal_Color();
    for(idx Y = 0; Y < VGA_HEIGHT; ++Y)
    {
       for(idx X = 0; X < VGA_WIDTH; ++X)
