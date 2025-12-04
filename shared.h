@@ -19,5 +19,10 @@ typedef struct {
 
 #define S(Literal) (string){(u8 *)(Literal), sizeof(Literal)-1}
 
+#define local_static static
+
 #define Array_Count(Array) (sizeof(Array) / sizeof((Array)[0]))
 #define Align(N) __attribute__((aligned(N)))
+
+#define Assert(Condition) do { if(!(Condition)) __builtin_trap(); } while(0)
+#define Invalid_Code_Path Assert(0)

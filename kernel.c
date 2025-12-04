@@ -63,7 +63,22 @@ void Kernel_Main(void)
    while(1)
    {
       Process_Keyboard_Input();
-      Flush_Keyboard_Events_To_Terminal();
+
+      key_event Event;
+      while(Keyboard_Events_Pending(&Event))
+      {
+         if(Key_Is_Pressed(Event.State))
+         {
+            if(Is_Printable(Event.Key_Code))
+            {
+               u8 Character = Shift_Is_Pressed(Event.State)
+                  ? Printable_Keys[Event.Key_Code].Shifted
+                  : Printable_Keys[Event.Key_Code].Character;
+
+               Write_Character_At_Terminal_Cursor(Character);
+            }
+         }
+      }
 
       asm volatile("hlt");
    }

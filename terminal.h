@@ -75,6 +75,3 @@ u16 Pack_VGA_Cell(u8 Character, u8 Color)
    u16 Result = ((u16)Color << 8) | (u16)Character;
    return(Result);
 }
-
-static void Write_String_At_Terminal_Cursor(string);
-static void Write_Hex_U8_At_Terminal_Cursor(u8);

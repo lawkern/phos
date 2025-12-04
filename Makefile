@@ -1,4 +1,10 @@
-CFLAGS=-Wall -Wextra -O0 -g -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable
+WARNINGS=-Wall -Wextra \
+-Wno-unused-function \
+-Wno-unused-parameter \
+-Wno-unused-variable \
+-Wno-unused-but-set-variable \
+
+CFLAGS=-O0 -g $(WARNINGS)
 
 compile:
 	mkdir -p build
