@@ -18,3 +18,6 @@ typedef struct {
 } string;
 
 #define S(Literal) (string){(u8 *)(Literal), sizeof(Literal)-1}
+
+#define Array_Count(Array) (sizeof(Array) / sizeof((Array)[0]))
+#define Align(N) __attribute__((aligned(N)))

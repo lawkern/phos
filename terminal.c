@@ -5,29 +5,32 @@ static terminal_context Terminal;
 static
 void Enable_Text_Cursor(u8 First_Scanline, u8 Last_Scanline)
 {
-   Send_Byte(0x3D4, 0x0A);
-   Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xC0) | First_Scanline);
+   Send_IO_Byte(0x3D4, 0x0A);
+   Send_IO_Byte(0x3D5, (Receive_IO_Byte(0x3D5) & 0xC0) | First_Scanline);
 
-   Send_Byte(0x3D4, 0x0B);
-   Send_Byte(0x3D5, (Receive_Byte(0x3D5) & 0xE0) | Last_Scanline);
+   Send_IO_Byte(0x3D4, 0x0B);
+   Send_IO_Byte(0x3D5, (Receive_IO_Byte(0x3D5) & 0xE0) | Last_Scanline);
 }
 
 static
 void Disable_Text_Cursor(void)
 {
-   Send_Byte(0x3D4, 0x0A);
-   Send_Byte(0x3D5, 0x20);
+   Send_IO_Byte(0x3D4, 0x0A);
+   Send_IO_Byte(0x3D5, 0x20);
 }
 
 static
-void Update_Text_Cursor(idx X, idx Y)
+void Update_Text_Cursor_Position(idx X, idx Y)
 {
+   Terminal.Cursor_X = X;
+   Terminal.Cursor_Y = Y;
+
    u16 Position = VGA_WIDTH*Y + X;
 
-   Send_Byte(0x3D4, 0x0F);
-   Send_Byte(0x3D5, (u8)(Position & 0xFF));
-   Send_Byte(0x3D4, 0x0E);
-   Send_Byte(0x3D5, (u8)((Position >> 8) & 0xFF));
+   Send_IO_Byte(0x3D4, 0x0F);
+   Send_IO_Byte(0x3D5, (u8)(Position & 0xFF));
+   Send_IO_Byte(0x3D4, 0x0E);
+   Send_IO_Byte(0x3D5, (u8)((Position >> 8) & 0xFF));
 }
 
 static inline
@@ -40,14 +43,12 @@ static
 void Initialize_Terminal(vga_color Foreground, vga_color Background)
 {
    Terminal.Memory = VGA_MEMORY;
-   Terminal.Cursor_X = 0;
-   Terminal.Cursor_Y = 0;
 
    Terminal.Foreground = Foreground;
    Terminal.Background = Background;
 
    Enable_Text_Cursor(1, 15);
-   Update_Text_Cursor(Terminal.Cursor_X, Terminal.Cursor_Y);
+   Update_Text_Cursor_Position(0, 0);
 
    u8 Cell_Color = Terminal_Color();
    for(idx Y = 0; Y < VGA_HEIGHT; ++Y)
@@ -72,6 +73,38 @@ void Write_String_To_Terminal_At(string String, idx X, idx Y, u8 Color)
    {
       Write_Character_To_Terminal_At(String.Data[Index], X+Index, Y, Color);
    }
+}
+
+static
+void Advance_Terminal_Cursor(idx Count)
+{
+   Terminal.Cursor_X += Count;
+   while(Terminal.Cursor_X >= VGA_WIDTH)
+   {
+      Terminal.Cursor_X -= VGA_WIDTH;
+      Terminal.Cursor_Y++;
+
+      if(Terminal.Cursor_Y == VGA_HEIGHT)
+      {
+         Terminal.Cursor_Y = 0;
+      }
+   }
+
+   Update_Text_Cursor_Position(Terminal.Cursor_X, Terminal.Cursor_Y);
+}
+
+static
+void Write_Character_At_Terminal_Cursor(u8 Character)
+{
+   Write_Character_To_Terminal_At(Character, Terminal.Cursor_X, Terminal.Cursor_Y, Terminal_Color());
+   Advance_Terminal_Cursor(1);
+}
+
+static
+void Write_String_At_Terminal_Cursor(string String)
+{
+   Write_String_To_Terminal_At(String, Terminal.Cursor_X, Terminal.Cursor_Y, Terminal_Color());
+   Advance_Terminal_Cursor(String.Length);
 }
 
 static

@@ -46,23 +46,6 @@ Boot_Main:
    mov %ax, %gs
    mov %ax, %ss
 
-   // Load interupt table (with dummy entries for now).
-   mov $256, %ecx
-   mov $IDT_Start, %edi
-
-   .Update_IDT_Offset:
-   movl $Generic_Interrupt, %eax
-   movw %ax, (%edi)
-   shrl $16, %eax
-   movw %ax,   6(%edi)
-   add $8, %edi
-   loop .Update_IDT_Offset
-
-   lidt IDT_Descriptor
-
-   // Enable interrupts.
-   sti
-
    // Set stack register.
    mov $Stack_Top, %esp
 
@@ -74,9 +57,19 @@ Boot_Main:
    .Spin: hlt
    jmp .Spin
 
-Generic_Interrupt:
+   .global Default_Interrupt
+Default_Interrupt:
+   pusha
+   call Default_Interrupt_C
+   popa
    iret
 
+   .global Keyboard_Interrupt
+Keyboard_Interrupt:
+   pusha
+   call Keyboard_Interrupt_C
+   popa
+   iret
 
    .section .data
 GDT_Start:
@@ -103,17 +96,3 @@ GDT_End:
 GDT_Descriptor:
    .2byte GDT_End - GDT_Start - 1
    .4byte GDT_Start
-
-IDT_Start:
-   .rept 256
-   .2byte 0x0000    // Offset 0:15
-   .2byte 0x08      // Code segment selector
-   .byte 0x00       // Reserved
-   .byte 0b10001110 // Present, Ring 0, Type: 32-bit Interrupt Gate
-   .2byte 0x0000    // Offset 16:31
-   .endr
-IDT_End:
-
-IDT_Descriptor:
-   .word IDT_End - IDT_Start - 1
-   .long IDT_Start

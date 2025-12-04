@@ -12,9 +12,11 @@
 #include "kernel.h"
 #include "terminal.h"
 #include "terminal.c"
+#include "interrupts.c"
 
 void Kernel_Main(void)
 {
+   Initialize_Interrupts();
    Initialize_Terminal(VGA_Light_Grey, VGA_Black);
 
    Draw_Terminal_Window(0, 0, VGA_WIDTH, VGA_HEIGHT, S("PHOS Ver. 0.0"));
@@ -45,7 +47,12 @@ void Kernel_Main(void)
       }
    }
 
-   string Prompt_String = S("root> ");
-   Write_String_To_Terminal_At(Prompt_String, Sub_Width_1+1, 2, Terminal_Color());
-   Update_Text_Cursor(Sub_Width_1+1+Prompt_String.Length, 2);
+   string Prompt_String = S("operator> ");
+   Update_Text_Cursor_Position(Sub_Width_1+1, 2);
+   Write_String_At_Terminal_Cursor(Prompt_String);
+
+   while(1)
+   {
+      asm volatile("hlt");
+   }
 }
