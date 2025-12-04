@@ -108,18 +108,51 @@ void Write_String_At_Terminal_Cursor(string String)
 }
 
 static
-void Draw_Terminal_Window(idx X, idx Y, idx Width, idx Height, string Title)
+void Write_Hex_U8_At_Terminal_Cursor(u8 Value)
 {
+   Write_String_At_Terminal_Cursor(S("0x"));
+   Write_Character_At_Terminal_Cursor("0123456789ABCDEF"[(Value >> 4) & 0xF]);
+   Write_Character_At_Terminal_Cursor("0123456789ABCDEF"[(Value >> 0) & 0xF]);
+}
+
+static
+void Draw_Terminal_Menu_Bar(void)
+{
+   u8 Title_Color = Pack_VGA_Color(VGA_Green, Terminal.Background);
    u8 Border_Color = Pack_VGA_Color(VGA_Dark_Grey, Terminal.Background);
-   u8 Title_Color = Pack_VGA_Color(VGA_Light_Blue, Terminal.Background);
+
+   idx X = 0;
+   idx Y = 0;
+
+   Write_Character_To_Terminal_At(BOX_N2W, X++, Y, Border_Color);
+   Write_Character_To_Terminal_At('[', X++, Y, Border_Color);
+
+   string OS_Name = S("Phos");
+   Write_String_To_Terminal_At(OS_Name, X, Y, Title_Color);
+   X += OS_Name.Length;
+
+   Write_Character_To_Terminal_At(']', X++, Y, Border_Color);
+   while(X < (VGA_WIDTH-1))
+   {
+      Write_Character_To_Terminal_At(BOX_H2, X++, Y, Border_Color);
+   }
+   Write_Character_To_Terminal_At(BOX_N2E, X++, Y, Border_Color);
+}
+
+static
+void Draw_Terminal_Window(idx X, idx Y, idx Width, idx Height, string Title, bool Selected)
+{
+   u8 Title_Color = Pack_VGA_Color(Selected ? VGA_Light_Green : VGA_Dark_Grey, Terminal.Background);
+   u8 Border_Color = Pack_VGA_Color(Selected ? VGA_Light_Grey : VGA_Dark_Grey, Terminal.Background);
 
    // Top border.
    idx At = X;
    Write_Character_To_Terminal_At(BOX_N2W, At++, Y, Border_Color);
-   Write_Character_To_Terminal_At(BOX_H2, At++, Y, Border_Color);
 
+   Write_Character_To_Terminal_At('[', At++, Y, Border_Color);
    Write_String_To_Terminal_At(Title, At, Y, Title_Color);
    At += Title.Length;
+   Write_Character_To_Terminal_At(']', At++, Y, Border_Color);
 
    while(At < (X+Width-1))
    {

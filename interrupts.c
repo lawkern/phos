@@ -29,13 +29,10 @@ void Default_Interrupt_C(void)
 extern void Keyboard_Interrupt(void);
 void Keyboard_Interrupt_C(void)
 {
-   u8 Scancode = Receive_IO_Byte(0x60);
-   Send_IO_Byte(0x20, 0x20);
+   u8 Byte = Receive_IO_Byte(0x60);
+   Push_Scan_Code_Byte(Byte);
 
-   if(!(Scancode & 0x80))
-   {
-      Write_Character_At_Terminal_Cursor('*');
-   }
+   Send_IO_Byte(0x20, 0x20);
 }
 
 static

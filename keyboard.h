@@ -1,0 +1,217 @@
+/* (c) copyright 2025 Lawrence D. Kern /////////////////////////////////////// */
+
+typedef enum {
+   Key_None,
+   Key_Pressed,
+   Key_Released,
+} key_state;
+
+typedef enum {
+   Key_Code_Escape,
+   Key_Code_F1,
+   Key_Code_F2,
+   Key_Code_F3,
+   Key_Code_F4,
+   Key_Code_F5,
+   Key_Code_F6,
+   Key_Code_F7,
+   Key_Code_F8,
+   Key_Code_F9,
+   Key_Code_F10,
+   Key_Code_F11,
+   Key_Code_F12,
+   Key_Code_Home,
+   Key_Code_End,
+   Key_Code_Insert,
+   Key_Code_Delete,
+
+   Key_Code_Tick,
+   Key_Code_1,
+   Key_Code_2,
+   Key_Code_3,
+   Key_Code_4,
+   Key_Code_5,
+   Key_Code_6,
+   Key_Code_7,
+   Key_Code_8,
+   Key_Code_9,
+   Key_Code_0,
+   Key_Code_Minus,
+   Key_Code_Equals,
+   Key_Code_Backspace,
+
+   Key_Code_Tab,
+   Key_Code_Q,
+   Key_Code_W,
+   Key_Code_E,
+   Key_Code_R,
+   Key_Code_T,
+   Key_Code_Y,
+   Key_Code_U,
+   Key_Code_I,
+   Key_Code_O,
+   Key_Code_P,
+   Key_Code_Open_Bracket,
+   Key_Code_Close_Bracket,
+   Key_Code_Backslash,
+
+   Key_Code_Capslock,
+   Key_Code_A,
+   Key_Code_S,
+   Key_Code_D,
+   Key_Code_F,
+   Key_Code_G,
+   Key_Code_H,
+   Key_Code_J,
+   Key_Code_K,
+   Key_Code_L,
+   Key_Code_Semicolon,
+   Key_Code_Quote,
+   Key_Code_Enter,
+
+   Key_Code_Shift_Left,
+   Key_Code_Z,
+   Key_Code_X,
+   Key_Code_C,
+   Key_Code_V,
+   Key_Code_B,
+   Key_Code_N,
+   Key_Code_M,
+   Key_Code_Comma,
+   Key_Code_Period,
+   Key_Code_Slash,
+   Key_Code_Shift_Right,
+
+   Key_Code_Function,
+   Key_Code_Control_Left,
+   Key_Code_Super,
+   Key_Code_Alt_Left,
+   Key_Code_Space,
+   Key_Code_Alt_Right,
+   Key_Code_Print,
+   Key_Code_Control_Right,
+   Key_Code_Page_Up,
+   Key_Code_Page_Down,
+   Key_Code_Up,
+   Key_Code_Down,
+   Key_Code_Left,
+   Key_Code_Right,
+
+   Key_Code_Pause,
+} key_code;
+
+typedef struct {
+   key_code Code;
+   key_state State;
+   string Print;
+} key_event;
+
+// TODO: Support layouts besides qwerty.
+static key_event Scan_Code_Set_1[4][256] =
+{
+   // NOTE: Single-byte scan codes.
+   {
+      [0x01] = {Key_Code_Escape, Key_Pressed, S("<Esc>")},
+      [0x02] = {Key_Code_1, Key_Pressed, S("1")},
+      [0x03] = {Key_Code_2, Key_Pressed, S("2")},
+      [0x04] = {Key_Code_3, Key_Pressed, S("3")},
+      [0x05] = {Key_Code_4, Key_Pressed, S("4")},
+      [0x06] = {Key_Code_5, Key_Pressed, S("5")},
+      [0x07] = {Key_Code_6, Key_Pressed, S("6")},
+      [0x08] = {Key_Code_7, Key_Pressed, S("7")},
+      [0x09] = {Key_Code_8, Key_Pressed, S("8")},
+      [0x0A] = {Key_Code_9, Key_Pressed, S("9")},
+      [0x0B] = {Key_Code_0, Key_Pressed, S("0")},
+      [0x0C] = {Key_Code_Minus, Key_Pressed, S("-")},
+      [0x0D] = {Key_Code_Equals, Key_Pressed, S("=")},
+      [0x0E] = {Key_Code_Backspace, Key_Pressed, S("^H")},
+
+      [0x0F] = {Key_Code_Tab, Key_Pressed, S("	")},
+      [0x10] = {Key_Code_Q, Key_Pressed, S("Q")},
+      [0x11] = {Key_Code_W, Key_Pressed, S("W")},
+      [0x12] = {Key_Code_E, Key_Pressed, S("E")},
+      [0x13] = {Key_Code_R, Key_Pressed, S("R")},
+      [0x14] = {Key_Code_T, Key_Pressed, S("T")},
+      [0x15] = {Key_Code_Y, Key_Pressed, S("Y")},
+      [0x16] = {Key_Code_U, Key_Pressed, S("U")},
+      [0x17] = {Key_Code_I, Key_Pressed, S("I")},
+      [0x18] = {Key_Code_O, Key_Pressed, S("O")},
+      [0x19] = {Key_Code_P, Key_Pressed, S("P")},
+      [0x1A] = {Key_Code_Open_Bracket, Key_Pressed, S("[")},
+      [0x1B] = {Key_Code_Close_Bracket, Key_Pressed, S("]")},
+      [0x1C] = {Key_Code_Enter, Key_Pressed, S("<Ret>")},
+
+      [0x1D] = {Key_Code_Control_Left, Key_Pressed, S("<Ctrl>")},
+      [0x1E] = {Key_Code_A, Key_Pressed, S("A")},
+      [0x1F] = {Key_Code_S, Key_Pressed, S("S")},
+      [0x20] = {Key_Code_D, Key_Pressed, S("D")},
+      [0x21] = {Key_Code_F, Key_Pressed, S("F")},
+      [0x22] = {Key_Code_G, Key_Pressed, S("G")},
+      [0x23] = {Key_Code_H, Key_Pressed, S("H")},
+      [0x24] = {Key_Code_I, Key_Pressed, S("I")},
+      [0x25] = {Key_Code_K, Key_Pressed, S("K")},
+      [0x26] = {Key_Code_L, Key_Pressed, S("L")},
+      [0x27] = {Key_Code_Semicolon, Key_Pressed, S(";")},
+      [0x28] = {Key_Code_Quote, Key_Pressed, S("'")},
+      [0x29] = {Key_Code_Tick, Key_Pressed, S("`")},
+
+      [0x2A] = {Key_Code_Shift_Left, Key_Pressed, S("<Shift>")},
+      [0x2B] = {Key_Code_Backslash, Key_Pressed, S("\\")},
+      [0x2C] = {Key_Code_Z, Key_Pressed, S("Z")},
+      [0x2D] = {Key_Code_X, Key_Pressed, S("X")},
+      [0x2E] = {Key_Code_C, Key_Pressed, S("C")},
+      [0x2F] = {Key_Code_V, Key_Pressed, S("V")},
+      [0x30] = {Key_Code_B, Key_Pressed, S("B")},
+      [0x31] = {Key_Code_N, Key_Pressed, S("N")},
+      [0x32] = {Key_Code_M, Key_Pressed, S("M")},
+      [0x33] = {Key_Code_Comma, Key_Pressed, S(",")},
+      [0x34] = {Key_Code_Period, Key_Pressed, S(".")},
+      [0x35] = {Key_Code_Slash, Key_Pressed, S("/")},
+      [0x36] = {Key_Code_Shift_Right, Key_Pressed, S("<Shift>")},
+
+      [0x38] = {Key_Code_Alt_Left, Key_Pressed, S("<Alt>")},
+      [0x39] = {Key_Code_Space, Key_Pressed, S(" ")},
+      [0x3A] = {Key_Code_Capslock, Key_Pressed, S("<Caps>")},
+      [0x3B] = {Key_Code_F1, Key_Pressed, S("<F1>")},
+      [0x3C] = {Key_Code_F2, Key_Pressed, S("<F2>")},
+      [0x3D] = {Key_Code_F3, Key_Pressed, S("<F3>")},
+      [0x3E] = {Key_Code_F4, Key_Pressed, S("<F4>")},
+      [0x3F] = {Key_Code_F5, Key_Pressed, S("<F5>")},
+
+      [0x40] = {Key_Code_F6, Key_Pressed, S("<F6>")},
+      [0x41] = {Key_Code_F7, Key_Pressed, S("<F7>")},
+      [0x42] = {Key_Code_F8, Key_Pressed, S("<F8>")},
+      [0x43] = {Key_Code_F9, Key_Pressed, S("<F9>")},
+      [0x44] = {Key_Code_F10, Key_Pressed, S("<F10>")},
+
+      [0x57] = {Key_Code_F11, Key_Pressed, S("F11")},
+      [0x58] = {Key_Code_F12, Key_Pressed, S("F12")},
+   },
+
+   // NOTE: Extended key, 1 additional byte.
+   {
+      [0x47] = {Key_Code_Home, Key_Pressed, S("<Home>")},
+      [0x48] = {Key_Code_Up, Key_Pressed, S("<Up>")},
+      [0x49] = {Key_Code_Page_Up, Key_Pressed, S("<PgUp>")},
+      [0x4B] = {Key_Code_Left, Key_Pressed, S("<Left>")},
+      [0x4D] = {Key_Code_Right, Key_Pressed, S("<Right>")},
+      [0x4F] = {Key_Code_End, Key_Pressed, S("<End>")},
+      [0x50] = {Key_Code_Down, Key_Pressed, S("<Down>")},
+      [0x51] = {Key_Code_Page_Down, Key_Pressed, S("<PgDn>")},
+      [0x52] = {Key_Code_Insert, Key_Pressed, S("<Ins>")},
+      [0x53] = {Key_Code_Delete, Key_Pressed, S("<Del>")},
+
+      [0x5B] = {Key_Code_Super, Key_Pressed, S("<Super>")},
+   },
+
+   // NOTE: Print key, 3 additional bytes.
+   {
+      [0x2A] = {Key_Code_Print, Key_Pressed, S("<PrtSc>")},
+      [0xB7] = {Key_Code_Print, Key_Released, S("<PrtSc>")},
+   },
+
+   // NOTE: Pause key, 5 additional bytes.
+   {
+      [0x1D] = {Key_Code_Pause, Key_Pressed, S("<Pause>")},
+   },
+};

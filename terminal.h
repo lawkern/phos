@@ -36,31 +36,31 @@ typedef struct {
    vga_color Background;
 } terminal_context;
 
-#define BOX_V    0xB3    // │
-#define BOX_VW   0xB4    // ┤
-#define BOX_VW2  0xB5    // ╡
-#define BOX_V2W  0xB6    // ╢
-#define BOX_NE2  0xB7    // ╖
-#define BOX_N2E  0xB8    // ╕
-#define BOX_2V2W 0xB9    // ╣
-#define BOX_V2   0xBA    // ║
-#define BOX_N2E2 0xBB    // ╗
-#define BOX_S2E2 0xBC    // ╝
-#define BOX_SE2  0xBD    // ╜
-#define BOX_S2E  0xBE    // ╛
-#define BOX_NE   0xBF    // ┐
+#define BOX_V    0xB3  // │
+#define BOX_VW   0xB4  // ┤
+#define BOX_VW2  0xB5  // ╡
+#define BOX_V2W  0xB6  // ╢
+#define BOX_NE2  0xB7  // ╖
+#define BOX_N2E  0xB8  // ╕
+#define BOX_2V2W 0xB9  // ╣
+#define BOX_V2   0xBA  // ║
+#define BOX_N2E2 0xBB  // ╗
+#define BOX_S2E2 0xBC  // ╝
+#define BOX_SE2  0xBD  // ╜
+#define BOX_S2E  0xBE  // ╛
+#define BOX_NE   0xBF  // ┐
 
-#define BOX_SW 0xC0    // └
-#define BOX_HN 0xC1    // ┴
-#define BOX_HS 0xC2    // ┬
-#define BOX_VE 0xC3    // ├
-#define BOX_H  0xC4    // ─
-#define BOX_H2 0xCD    // ═
+#define BOX_SW 0xC0  // └
+#define BOX_HN 0xC1  // ┴
+#define BOX_HS 0xC2  // ┬
+#define BOX_VE 0xC3  // ├
+#define BOX_H  0xC4  // ─
+#define BOX_H2 0xCD  // ═
 
-#define BOX_NW  0xDA   // ┌
-#define BOX_N2W 0xD5   // ╒
-#define BOX_SE  0xD9   // ┘
-#define BOX_SOLID 0xDB // █
+#define BOX_NW   0xDA  // ┌
+#define BOX_N2W  0xD5  // ╒
+#define BOX_SE   0xD9  // ┘
+#define BOX_FULL 0xDB  // █
 
 static inline
 u8 Pack_VGA_Color(vga_color FG, vga_color BG)
@@ -75,3 +75,6 @@ u16 Pack_VGA_Cell(u8 Character, u8 Color)
    u16 Result = ((u16)Color << 8) | (u16)Character;
    return(Result);
 }
+
+static void Write_String_At_Terminal_Cursor(string);
+static void Write_Hex_U8_At_Terminal_Cursor(u8);
