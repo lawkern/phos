@@ -64,6 +64,13 @@ Default_Interrupt:
    popa
    iret
 
+   .global Timer_Interrupt
+Timer_Interrupt:
+   pusha
+   call Timer_Interrupt_C
+   popa
+   iret
+
    .global Keyboard_Interrupt
 Keyboard_Interrupt:
    pusha

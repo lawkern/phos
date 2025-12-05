@@ -26,6 +26,30 @@ void Default_Interrupt_C(void)
 {
 }
 
+static u8 Disable_NMI = 0;
+static volatile u32 Timer_Count;
+static volatile u8 Time_Values[10];
+
+extern void Timer_Interrupt(void);
+void Timer_Interrupt_C(void)
+{
+   Timer_Count++;
+
+   // TODO: Checking the time on each interrupt can potentially read an
+   // incomplete CMOS update, resulting in seconds updating but not minutes,
+   // etc. Check the time once at startup instead, and then offset based on
+   // timer ticks.
+
+   u8 Registers[] = {0x00, 0x02, 0x04, 0x06, 0x07, 0x08, 0x09, 0x32, 0x0A, 0x0B};
+   for(int Index = 0; Index < Array_Count(Registers); ++Index)
+   {
+      Send_IO_Byte(0x70, (Disable_NMI << 7) | Registers[Index]);
+      Time_Values[Index] = Receive_IO_Byte(0x71);
+   }
+
+   Send_IO_Byte(0x20, 0x20);
+}
+
 extern void Keyboard_Interrupt(void);
 void Keyboard_Interrupt_C(void)
 {
@@ -65,13 +89,14 @@ void Initialize_Interrupts(void)
    Send_IO_Byte(0xA1, 0x01); Delay_IO();
 
    // Unmask PICs.
-   Send_IO_Byte(0x21, 0xFD); Delay_IO();
+   Send_IO_Byte(0x21, 0xFC); Delay_IO();
    Send_IO_Byte(0xA1, 0xFF); Delay_IO();
 
    for(int Index = 0; Index < 256; ++Index)
    {
       Set_IDT_Entry(Index, Default_Interrupt);
    }
+   Set_IDT_Entry(0x20, Timer_Interrupt);
    Set_IDT_Entry(0x21, Keyboard_Interrupt);
 
    asm volatile("lidt %0" :: "m"(IDT_Descriptor) : "memory");

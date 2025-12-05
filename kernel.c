@@ -22,8 +22,6 @@ void Kernel_Main(void)
    Initialize_Interrupts();
    Initialize_Terminal(VGA_Light_Grey, VGA_Black);
 
-   Draw_Terminal_Menu_Bar();
-
    idx Sub_Width_1 = (VGA_WIDTH / 2) - 1 - 8;
    idx Sub_Width_2 = VGA_WIDTH - Sub_Width_1;
    idx Sub_Height = VGA_HEIGHT - 1;
@@ -63,6 +61,7 @@ void Kernel_Main(void)
    while(1)
    {
       Process_Keyboard_Input();
+      Draw_Terminal_Menu_Bar();
 
       key_event Event;
       while(Keyboard_Events_Pending(&Event))

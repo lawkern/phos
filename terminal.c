@@ -76,6 +76,13 @@ void Write_String_To_Terminal_At(string String, idx X, idx Y, u8 Color)
 }
 
 static
+void Write_U8_To_Terminal_At(u8 Value, idx X, idx Y, u8 Color)
+{
+   Write_Character_To_Terminal_At("0123456789ABCDEF"[(Value >> 4) & 0xF], X+0, Y, Color);
+   Write_Character_To_Terminal_At("0123456789ABCDEF"[(Value >> 0) & 0xF], X+1, Y, Color);
+}
+
+static
 void Advance_Terminal_Cursor(idx Count)
 {
    Terminal.Cursor_X += Count;
@@ -108,16 +115,17 @@ void Write_String_At_Terminal_Cursor(string String)
 }
 
 static
-void Write_Hex_U8_At_Terminal_Cursor(u8 Value)
+void Write_U8_At_Terminal_Cursor(u8 Value)
 {
-   Write_String_At_Terminal_Cursor(S("0x"));
-   Write_Character_At_Terminal_Cursor("0123456789ABCDEF"[(Value >> 4) & 0xF]);
-   Write_Character_At_Terminal_Cursor("0123456789ABCDEF"[(Value >> 0) & 0xF]);
+   Write_U8_To_Terminal_At(Value, Terminal.Cursor_X, Terminal.Cursor_Y, Terminal_Color());
+   Advance_Terminal_Cursor(2);
 }
 
 static
 void Draw_Terminal_Menu_Bar(void)
 {
+   // TODO: String interpolation.
+
    u8 Title_Color = Pack_VGA_Color(VGA_Green, Terminal.Background);
    u8 Border_Color = Pack_VGA_Color(VGA_Dark_Grey, Terminal.Background);
 
@@ -132,6 +140,22 @@ void Draw_Terminal_Menu_Bar(void)
    X += OS_Name.Length;
 
    Write_Character_To_Terminal_At(']', X++, Y, Border_Color);
+   Write_Character_To_Terminal_At(BOX_H2, X++, Y, Border_Color);
+
+   Write_U8_To_Terminal_At(Time_Values[7], X++, Y, Border_Color); X++;
+   Write_U8_To_Terminal_At(Time_Values[6], X++, Y, Border_Color); X++;
+   Write_Character_To_Terminal_At('-', X++, Y, Border_Color);
+   Write_U8_To_Terminal_At(Time_Values[5], X++, Y, Border_Color); X++;
+   Write_Character_To_Terminal_At('-', X++, Y, Border_Color);
+   Write_U8_To_Terminal_At(Time_Values[4], X++, Y, Border_Color); X++;
+   Write_Character_To_Terminal_At(' ', X++, Y, Border_Color);
+
+   Write_U8_To_Terminal_At(Time_Values[2], X++, Y, Border_Color); X++;
+   Write_Character_To_Terminal_At(':', X++, Y, Border_Color);
+   Write_U8_To_Terminal_At(Time_Values[1], X++, Y, Border_Color); X++;
+   Write_Character_To_Terminal_At(':', X++, Y, Border_Color);
+   Write_U8_To_Terminal_At(Time_Values[0], X++, Y, Border_Color); X++;
+
    while(X < (VGA_WIDTH-1))
    {
       Write_Character_To_Terminal_At(BOX_H2, X++, Y, Border_Color);

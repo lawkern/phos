@@ -21,7 +21,7 @@ typedef struct {
 
 #define local_static static
 
-#define Array_Count(Array) (sizeof(Array) / sizeof((Array)[0]))
+#define Array_Count(Array) (idx)(sizeof(Array) / sizeof((Array)[0]))
 #define Align(N) __attribute__((aligned(N)))
 
 #define Assert(Condition) do { if(!(Condition)) __builtin_trap(); } while(0)
