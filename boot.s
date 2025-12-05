@@ -1,4 +1,6 @@
-   /* (c) copyright 2025 Lawrence D. Kern /////////////////////////////////////// */
+/* (c) copyright 2025 Lawrence D. Kern /////////////////////////////////////// */
+
+#define Global_Function(Label) .global Label; .type symbol, @function; Label
 
    .section .multiboot
    .set Multiboot_Align, 1<<0
@@ -20,9 +22,7 @@ Stack_Top:
 
 
    .section .text
-   .global Boot_Main
-Boot_Main:
-   // Disable interrupts.
+Global_Function(Boot_Main):
    cli
 
    // Enable protection bit for protected mode (redundant since multiboot
@@ -31,34 +31,21 @@ Boot_Main:
    or $0x1, %eax
    mov %eax, %cr0
 
-   // Load GDT.
    lgdt GDT_Descriptor
 
    // Perform far jump to load code segment.
    ljmp $0x08, $.Reload_Code_Segment
    .Reload_Code_Segment:
 
-   // Fill segment registers with data segment offset.
-   mov $0x10, %ax
-   mov %ax, %ds
-   mov %ax, %es
-   mov %ax, %fs
-   mov %ax, %gs
-   mov %ax, %ss
-
-   // Set stack register.
    mov $Stack_Top, %esp
 
-   // Enter C code entry point for kernel.
    call Kernel_Main
 
-   // Spin if kernel exits.
    cli
    .Spin: hlt
    jmp .Spin
 
-   .global Enable_Memory_Paging
-Enable_Memory_Paging:
+Global_Function(Enable_Memory_Paging):
    push %ebp
    mov %esp, %ebp
    mov 8(%esp), %eax
@@ -70,36 +57,31 @@ Enable_Memory_Paging:
    pop %ebp
    ret
 
-   .global Default_Interrupt
-Default_Interrupt:
+Global_Function(Default_Interrupt):
    pusha
    call Default_Interrupt_C
    popa
    iret
 
-   .global Division_Error_Interrupt
-Division_Error_Interrupt:
+Global_Function(Division_Error_Interrupt):
    pusha
    call Division_Error_Interrupt_C
    popa
    iret
 
-   .global Page_Fault_Interrupt
-Page_Fault_Interrupt:
+Global_Function(Page_Fault_Interrupt):
    pusha
    call Page_Fault_Interrupt_C
    popa
    iret
 
-   .global Timer_Interrupt
-Timer_Interrupt:
+Global_Function(Timer_Interrupt):
    pusha
    call Timer_Interrupt_C
    popa
    iret
 
-   .global Keyboard_Interrupt
-Keyboard_Interrupt:
+Global_Function(Keyboard_Interrupt):
    pusha
    call Keyboard_Interrupt_C
    popa
