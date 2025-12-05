@@ -21,13 +21,40 @@ static_assert(sizeof(idt_descriptor) == 6);
 static Align(0x10) idt_entry IDT[256];
 static idt_descriptor IDT_Descriptor = {sizeof(IDT) - 1, IDT};
 
+static volatile u32 Default_Count;
+static volatile u32 Page_Fault_Count;
+static volatile u32 Timer_Count;
+
 extern void Default_Interrupt(void);
 void Default_Interrupt_C(void)
 {
+   Default_Count++;
+   Send_IO_Byte(0x20, 0x20);
+}
+
+extern void Division_Error_Interrupt(void);
+void Division_Error_Interrupt_C(void)
+{
+   if(Current_Ring() == 0)
+   {
+      // TODO: Kernel panic.
+   }
+   else
+   {
+      // TODO: Terminate process.
+   }
+
+   Send_IO_Byte(0x20, 0x20);
+}
+
+extern void Page_Fault_Interrupt(void);
+void Page_Fault_Interrupt_C(void)
+{
+   Page_Fault_Count++;
+   Send_IO_Byte(0x20, 0x20);
 }
 
 static u8 Disable_NMI = 0;
-static volatile u32 Timer_Count;
 static volatile u8 Time_Values[10];
 
 extern void Timer_Interrupt(void);
@@ -96,6 +123,8 @@ void Initialize_Interrupts(void)
    {
       Set_IDT_Entry(Index, Default_Interrupt);
    }
+   Set_IDT_Entry(0x00, Division_Error_Interrupt);
+   Set_IDT_Entry(0x0E, Page_Fault_Interrupt);
    Set_IDT_Entry(0x20, Timer_Interrupt);
    Set_IDT_Entry(0x21, Keyboard_Interrupt);
 

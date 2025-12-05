@@ -22,10 +22,19 @@ void Delay_IO(void)
 }
 
 static inline
-b32 In_Protected_Mode(void)
+b32 Protected_Mode_Enabled(void)
 {
    u32 CR0;
    asm volatile("mov %%cr0, %0" : "=r"(CR0));
 
    return(CR0 & 0x1);
+}
+
+static inline
+u32 Current_Ring(void)
+{
+   u32 CS;
+   asm volatile("mov %%cs, %0" : "=r"(CS));
+
+   return(CS & 0x3);
 }

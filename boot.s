@@ -57,10 +57,37 @@ Boot_Main:
    .Spin: hlt
    jmp .Spin
 
+   .global Enable_Memory_Paging
+Enable_Memory_Paging:
+   push %ebp
+   mov %esp, %ebp
+   mov 8(%esp), %eax
+   mov %eax, %cr3
+   mov %cr0, %eax
+   or $0x80000001, %eax
+   mov %eax, %cr0
+   mov %ebp, %esp
+   pop %ebp
+   ret
+
    .global Default_Interrupt
 Default_Interrupt:
    pusha
    call Default_Interrupt_C
+   popa
+   iret
+
+   .global Division_Error_Interrupt
+Division_Error_Interrupt:
+   pusha
+   call Division_Error_Interrupt_C
+   popa
+   iret
+
+   .global Page_Fault_Interrupt
+Page_Fault_Interrupt:
+   pusha
+   call Page_Fault_Interrupt_C
    popa
    iret
 

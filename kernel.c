@@ -14,11 +14,13 @@
 #include "terminal.h"
 
 #include "keyboard.c"
+#include "memory.c"
 #include "interrupts.c"
 #include "terminal.c"
 
 void Kernel_Main(void)
 {
+   Initialize_Memory();
    Initialize_Interrupts();
    Initialize_Terminal(VGA_Light_Grey, VGA_Black);
 
@@ -30,13 +32,17 @@ void Kernel_Main(void)
    Draw_Terminal_Window(0, 9, Sub_Width_1, Sub_Height-8, S("Character Set"), 0);
    Draw_Terminal_Window(Sub_Width_1, 1, Sub_Width_2, Sub_Height, S("Shell"), 1);
 
-   string Mode_String = (In_Protected_Mode()) ? S("32-bit Protected Mode") : S("Real Mode");
+   string Mode_String = (Protected_Mode_Enabled()) ? S("32-bit Protected Mode") : S("Real Mode");
    Write_String_To_Terminal_At(Mode_String, 1, 2, Terminal_Color());
 
-   Write_String_To_Terminal_At(S("VGA Colors:"), 1, 3, Terminal_Color());
+   string Ring_String = S("Ring: ");
+   Write_String_To_Terminal_At(Ring_String, 1, 3, Terminal_Color());
+   Write_Character_To_Terminal_At('0' + (u8)Current_Ring(), 1+Ring_String.Length, 3, Terminal_Color());
+
+   Write_String_To_Terminal_At(S("VGA Colors:"), 1, 4, Terminal_Color());
    for(vga_color Color = 0; Color < VGA_Color_Count; ++Color)
    {
-      Write_Character_To_Terminal_At(BOX_FULL, Color+1, 4, Color);
+      Write_Character_To_Terminal_At(BOX_FULL, Color+1, 5, Color);
    }
 
    int X = 1;
