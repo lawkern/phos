@@ -3,6 +3,7 @@
 typedef enum {
    Key_State_Pressed,
    Key_State_Shift,
+   Key_State_Control,
    Key_State_Alt,
    Key_State_Super,
 } key_state_flag;
@@ -18,6 +19,27 @@ static inline
 bool Shift_Is_Pressed(u32 State)
 {
    bool Result = (State & (1 << Key_State_Shift));
+   return(Result);
+}
+
+static inline
+bool Control_Is_Pressed(u32 State)
+{
+   bool Result = (State & (1 << Key_State_Control));
+   return(Result);
+}
+
+static inline
+bool Alt_Is_Pressed(u32 State)
+{
+   bool Result = (State & (1 << Key_State_Alt));
+   return(Result);
+}
+
+static inline
+bool Super_Is_Pressed(u32 State)
+{
+   bool Result = (State & (1 << Key_State_Super));
    return(Result);
 }
 

@@ -34,6 +34,7 @@ void Push_Keyboard_Event(scan_code_type Scan_Code_Type, u8 Scan_Code_Index)
 
    // NOTE: Track key modifier state.
    local_static u32 Shift_Bit = 0;
+   local_static u32 Control_Bit = 0;
    local_static u32 Alt_Bit = 0;
    local_static u32 Super_Bit = 0;
 
@@ -46,6 +47,10 @@ void Push_Keyboard_Event(scan_code_type Scan_Code_Type, u8 Scan_Code_Index)
    {
       Alt_Bit = (u32)Scan_Code.Pressed << Key_State_Alt;
    }
+   else if(Scan_Code.Key_Code == Key_Code_Control_Left || Scan_Code.Key_Code == Key_Code_Control_Right)
+   {
+      Control_Bit = (u32)Scan_Code.Pressed << Key_State_Control;
+   }
    else if(Scan_Code.Key_Code == Key_Code_Super_Left || Scan_Code.Key_Code == Key_Code_Super_Right)
    {
       Super_Bit = (u32)Scan_Code.Pressed << Key_State_Super;
@@ -53,7 +58,7 @@ void Push_Keyboard_Event(scan_code_type Scan_Code_Type, u8 Scan_Code_Index)
 
    key_event Event = {0};
    Event.Key_Code = Scan_Code.Key_Code;
-   Event.State = (Pressed_Bit | Shift_Bit | Alt_Bit | Super_Bit);
+   Event.State = (Pressed_Bit | Shift_Bit | Control_Bit | Alt_Bit | Super_Bit);
 
    Pending_Keyboard_Events.Events[Pending_Keyboard_Events.Write_Index++] = Event;
 }
