@@ -24,57 +24,42 @@ void Kernel_Main(void)
    Initialize_Interrupts();
    Initialize_Terminal(VGA_Light_Grey, VGA_Black);
 
-   idx Sub_Width_1 = (VGA_WIDTH / 2) - 1 - 8;
-   idx Sub_Width_2 = VGA_WIDTH - Sub_Width_1;
-   idx Sub_Height = VGA_HEIGHT - 1;
-
-   Draw_Terminal_Window(0, 1, Sub_Width_1, 8, S("System Information"), 0);
-   Draw_Terminal_Window(0, 9, Sub_Width_1, Sub_Height-8, S("Character Set"), 0);
-   Draw_Terminal_Window(Sub_Width_1, 1, Sub_Width_2, Sub_Height, S("Shell"), 1);
-
-   string Mode_String = (Protected_Mode_Enabled()) ? S("32-bit Protected Mode") : S("Real Mode");
-   Write_String_To_Terminal_At(Mode_String, 1, 2, Terminal_Color());
-
-   string Ring_String = S("Ring: ");
-   Write_String_To_Terminal_At(Ring_String, 1, 3, Terminal_Color());
-   Write_Character_To_Terminal_At('0' + (u8)Current_Ring(), 1+Ring_String.Length, 3, Terminal_Color());
-
-   Write_String_To_Terminal_At(S("VGA Colors:"), 1, 4, Terminal_Color());
-   for(vga_color Color = 0; Color < VGA_Color_Count; ++Color)
-   {
-      Write_Character_To_Terminal_At(BOX_FULL, Color+1, 5, Color);
-   }
-
-   int X = 1;
-   int Y = 10;
-   for(int Index = 0; Index <= 255; ++Index)
-   {
-      u8 Character = (u8)Index;
-      Write_Character_To_Terminal_At(Character, X, Y, Terminal_Color());
-
-      X++;
-      if(X > (Sub_Width_1 - 2))
-      {
-         X = 1;
-         Y++;
-      }
-   }
-
-   string Prompt_String = S("operator> ");
-   Update_Text_Cursor_Position(Sub_Width_1+1, 2);
-   Write_String_At_Terminal_Cursor(Prompt_String);
-
+   bool Dirty_Frame = true;
    while(1)
    {
       Process_Keyboard_Input();
-      Draw_Terminal_Menu_Bar();
 
       key_event Event;
       while(Keyboard_Events_Pending(&Event))
       {
          if(Key_Is_Pressed(Event.State))
          {
-            if(Is_Printable(Event.Key_Code))
+            if(Control_Is_Pressed(Event.State))
+            {
+               if(Number_Is_Pressed(Event))
+               {
+                  // NOTE: Jump to a terminal frame by number.
+                  Terminal.Current_Frame_Index = Event.Key_Code - Key_Code_First_Number;
+               }
+               else if(Event.Key_Code == Key_Code_X)
+               {
+                  // NOTE: Cycle layouts for current terminal frame.
+                  terminal_frame *Frame = Terminal.Frames + Terminal.Current_Frame_Index;
+                  Frame->Layout++;
+                  Frame->Layout %= Terminal_Frame_Layout_Count;
+               }
+               else if(Event.Key_Code == Key_Code_O)
+               {
+                  // NOTE: Move to next visible window in terminal frame.
+                  terminal_frame *Frame = Terminal.Frames + Terminal.Current_Frame_Index;
+                  if(Frame->Layout == Terminal_Frame_Dual_Window)
+                  {
+                     Frame->Active_Window_Index++;
+                     Frame->Active_Window_Index %= Array_Count(Frame->Windows);
+                  }
+               }
+            }
+            else if(Is_Printable(Event.Key_Code))
             {
                u8 Character = Shift_Is_Pressed(Event.State)
                   ? Printable_Keys[Event.Key_Code].Shifted
@@ -82,7 +67,16 @@ void Kernel_Main(void)
 
                Write_Character_At_Terminal_Cursor(Character);
             }
+
+            Dirty_Frame = true;
          }
+      }
+
+      Draw_Terminal_Menu_Bar(Terminal.Current_Frame_Index);
+      if(Dirty_Frame)
+      {
+         Draw_Terminal_Frame(Terminal.Current_Frame_Index);
+         Dirty_Frame = false;
       }
 
       asm volatile("hlt");

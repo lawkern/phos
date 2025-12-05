@@ -27,6 +27,23 @@ typedef enum {
    VGA_Color_Count,
 } vga_color;
 
+typedef enum {
+   Terminal_Frame_Single_Window,
+   Terminal_Frame_Dual_Window,
+   Terminal_Frame_Layout_Count,
+} terminal_frame_layout;
+
+typedef struct {
+   int Index;
+} terminal_window;
+
+typedef struct {
+   terminal_frame_layout Layout;
+
+   int Active_Window_Index;
+   terminal_window Windows[2];
+} terminal_frame;
+
 typedef struct {
    volatile u16 *Memory;
    idx Cursor_X;
@@ -34,6 +51,9 @@ typedef struct {
 
    vga_color Foreground;
    vga_color Background;
+
+   int Current_Frame_Index;
+   terminal_frame Frames[16];
 } terminal_context;
 
 #define BOX_V    0xB3  // │

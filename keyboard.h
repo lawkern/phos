@@ -45,7 +45,8 @@ bool Super_Is_Pressed(u32 State)
 
 typedef enum {
    // Printable characters.
-   Key_Code_0,
+   Key_Code_First_Number,
+   Key_Code_0 = Key_Code_First_Number,
    Key_Code_1,
    Key_Code_2,
    Key_Code_3,
@@ -55,6 +56,8 @@ typedef enum {
    Key_Code_7,
    Key_Code_8,
    Key_Code_9,
+   Key_Code_Last_Number = Key_Code_9,
+
    Key_Code_A,
    Key_Code_B,
    Key_Code_C,
@@ -223,6 +226,19 @@ typedef struct {
    key_code Key_Code;
    u32 State;
 } key_event;
+
+static inline
+bool Number_Is_Pressed(key_event Event)
+{
+   bool Result = Key_Is_Pressed(Event.State);
+   if(Result)
+   {
+      Result = ((Event.Key_Code >= Key_Code_First_Number) &&
+                (Event.Key_Code <= Key_Code_Last_Number));
+   }
+
+   return(Result);
+}
 
 // TODO: Support layouts besides qwerty.
 static scan_code_entry Scan_Code_Set_1[Scan_Code_Type_Count][256] =
